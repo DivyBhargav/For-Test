@@ -2,34 +2,52 @@ name: Issue Approval Workflow
 
 on:
   issue_comment:
-    types: [created]
+    types: [created]  # Trigger when a new comment is added
 
 jobs:
-  approval-check:
+  approve_or_reject:
     runs-on: ubuntu-latest
     steps:
-      - name: Check comment for approval
+      - name: Check comment for approval or rejection
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const comment = context.payload.comment.body.toLowerCase();
             const issueNumber = context.payload.issue.number;
-            const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+            const sender = context.payload.comment.user.login;  // Comment author
+            const repoOwner = context.repo.owner;
+            const repoName = context.repo.repo;
 
+            // Approve or Reject based on comment text
             if (comment.includes("approve")) {
-              await octokit.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+              await github.rest.issues.addLabels({
+                owner: repoOwner,
+                repo: repoName,
                 issue_number: issueNumber,
                 labels: ["Approved"]
               });
+
+              await github.rest.issues.createComment({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: issueNumber,
+                body: `✅ Issue approved by @${sender}`
+              });
+
             } else if (comment.includes("reject")) {
-              await octokit.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+              await github.rest.issues.addLabels({
+                owner: repoOwner,
+                repo: repoName,
                 issue_number: issueNumber,
                 labels: ["Rejected"]
               });
+
+              await github.rest.issues.createComment({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: issueNumber,
+                body: `❌ Issue rejected by @${sender}`
+              });
             }
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
