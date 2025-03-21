@@ -1,20 +1,17 @@
-name: Comment on New Issues
+name: Issue Commenter
 
 on:
   issues:
-    types:
-      - opened
+    types: [opened]
 
 jobs:
   add_comment:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write  # Grants permission to modify issues
+
     steps:
-      - name: Add a comment to the new issue
-        env:
-          GH_TOKEN: ${{ secrets.MY_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          REPO: ${{ github.repository }}
-        run: |
-          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "This is new comment for work flow testing"
+    - name: Add a comment to the issue
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        issue-number: ${{ github.event.issue.number }}
+        body: |
+          This is new comment for work flow testing on issue creation
