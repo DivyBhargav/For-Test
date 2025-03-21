@@ -26,5 +26,3 @@ jobs:
         run: |
           gh auth login --with-token <<< "$GITHUB_TOKEN"
           gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "This is new comment for work flow testing"
-
-Let me know if you need any more help or have other questions! 😊
