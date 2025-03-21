@@ -1,17 +1,30 @@
-name: Issue Commenter
+name: Comment on New Issues
 
 on:
   issues:
-    types: [opened]
+    types:
+      - opened
 
 jobs:
   add_comment:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write  # Grants permission to modify issues
 
     steps:
-    - name: Add a comment to the issue
-      uses: peter-evans/create-or-update-comment@v2
-      with:
-        issue-number: ${{ github.event.issue.number }}
-        body: |
-          This is new comment for work flow testing on issue creation
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh -y
+
+      - name: Add a comment to the new issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh auth login --with-token <<< "$GITHUB_TOKEN"
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "This is new comment for work flow testing"
+
+Let me know if you need any more help or have other questions! 😊
