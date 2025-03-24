@@ -1,4 +1,4 @@
-name: Comment on New Issues
+name: Add "Approval Pending" Label to New Issues
 
 on:
   issues:
@@ -6,23 +6,15 @@ on:
       - opened
 
 jobs:
-  add_comment:
+  label_issue:
     runs-on: ubuntu-latest
     permissions:
       issues: write  # Grants permission to modify issues
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh -y
-
-      - name: Add a comment to the new issue
+      - name: Add "Approval Pending" label
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_TOKEN }}
+          GH_TOKEN: ${{ secrets.MY_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          REPO: ${{ github.repository }}
+          REPO: "DivyBhargav/For-Test"
         run: |
-          gh auth login --with-token <<< "$GITHUB_TOKEN"
-          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "This is new comment for work flow testing"
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending"
