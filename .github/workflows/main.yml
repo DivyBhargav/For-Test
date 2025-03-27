@@ -1,10 +1,8 @@
 name: Add "Approval Pending" Label to New Issues
-
 on:
   issues:
     types:
       - opened
-
 jobs:
   label_issue:
     runs-on: ubuntu-latest
