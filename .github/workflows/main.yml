@@ -1,3 +1,23 @@
+# name: Add "Approval Pending" Label to New Issues
+# on:
+#   issues:
+#     types:
+#       - opened
+# jobs:
+#   label_issue:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       issues: write  # Grants permission to modify issues
+#     steps:
+#       - name: Add "Approval Pending" label
+#         env:
+#           GH_TOKEN: ${{ secrets.MY_TOKEN }}
+#           ISSUE_NUMBER: ${{ github.event.issue.number }}
+#           REPO: "DivyBhargav/For-Test"
+#         run: |
+#           gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending"
+
+
 name: Add "Approval Pending" Label to New Issues
 on:
   issues:
@@ -9,10 +29,14 @@ jobs:
     permissions:
       issues: write  # Grants permission to modify issues
     steps:
+      - name: Authenticate GitHub CLI
+        run: |
+          echo "${{ github.token }}" | gh auth login --with-token
+
       - name: Add "Approval Pending" label
         env:
-          GH_TOKEN: ${{ secrets.MY_TOKEN }}
+          GH_TOKEN: ${{ github.token }}  # Use built-in GitHub token
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          REPO: "DivyBhargav/For-Test"
+          REPO: ${{ github.repository }}  # Use dynamic repository name
         run: |
           gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending"
