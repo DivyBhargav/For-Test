@@ -15,6 +15,13 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
+      - name: Add the "ask for approval" label to the issue
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "ask for approval"
+
       - name: Add a comment to the issue
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -28,15 +35,3 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "bug"
-
-      - name: Assign issue to milestone "Implement"
-        env:
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          REPO: ${{ github.repository }}
-        run: |
-          MILESTONE_NUMBER=$(gh api repos/$REPO/milestones --jq '.[] | select(.title=="Implement") | .number')
-          if [ -n "$MILESTONE_NUMBER" ]; then
-            gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --milestone "$MILESTONE_NUMBER"
-          else
-            echo "Milestone 'Implement' not found."
-          fi
