@@ -29,7 +29,7 @@ jobs:
         run: |
           gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "bug"
 
-      - name: Assign issue to milestone "Implemented"
+      - name: Assign issue to milestone "Implement"
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
