@@ -1,42 +1,42 @@
-# name: Add "Approval Pending" Label to New Issues
-# on:
-#   issues:
-#     types:
-#       - opened
-# jobs:
-#   label_issue:
-#     runs-on: ubuntu-latest
-#     permissions:
-#       issues: write  # Grants permission to modify issues
-#     steps:
-#       - name: Add "Approval Pending" label
-#         env:
-#           GH_TOKEN: ${{ secrets.MY_TOKEN }}
-#           ISSUE_NUMBER: ${{ github.event.issue.number }}
-#           REPO: "DivyBhargav/For-Test"
-#         run: |
-#           gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending"
+name: Manage New Issues
 
-
-name: Add "Approval Pending" Label to New Issues
 on:
   issues:
     types:
       - opened
+
 jobs:
-  label_issue:
+  manage_issue:
     runs-on: ubuntu-latest
     permissions:
       issues: write  # Grants permission to modify issues
     steps:
       - name: Authenticate GitHub CLI
         run: |
-          echo "${{ github.token }}" | gh auth login --with-token
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Add "Approval Pending" label
+      - name: Add a comment to the issue
         env:
-          GH_TOKEN: ${{ github.token }}  # Use built-in GitHub token
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          REPO: ${{ github.repository }}  # Use dynamic repository name
+          REPO: ${{ github.repository }}
         run: |
-          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending"
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "Thank you for submitting this issue! Our team will review it shortly."
+
+      - name: Add labels to the issue
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending" --add-label "bug"
+
+      - name: Assign issue to milestone "Implemented"
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          MILESTONE_NUMBER=$(gh api repos/$REPO/milestones --jq '.[] | select(.title=="Implemented") | .number')
+          if [ -n "$MILESTONE_NUMBER" ]; then
+            gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --milestone "$MILESTONE_NUMBER"
+          else
+            echo "Milestone 'Implemented' not found."
+          fi
