@@ -15,12 +15,12 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Add the "ask for approval" label to the issue
+      - name: Add the "Approval Pending" label to the issue
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
         run: |
-          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "ask for approval"
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending"
 
       - name: Add a comment to the issue
         env:
