@@ -20,14 +20,14 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
         run: |
-          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "Thank you for submitting this issue! Our team will review it shortly."
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "New issue from ServiceNow is created"
 
-      - name: Add labels to the issue
+      - name: Add the "bug" label to the issue
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
         run: |
-          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending" --add-label "bug"
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "bug"
 
       - name: Assign issue to milestone "Implemented"
         env:
