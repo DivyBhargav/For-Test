@@ -35,3 +35,10 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "bug"
+
+      - name: Add another comment to the issue
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "Hello, We are in new change"
