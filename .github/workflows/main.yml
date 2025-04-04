@@ -14,31 +14,42 @@ jobs:
       - name: Authenticate GitHub CLI
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-
       - name: Add the "Approval Pending" label to the issue
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
         run: |
           gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "Approval Pending"
-
       - name: Add a comment to the issue
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
         run: |
           gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "New issue from ServiceNow is created"
-
       - name: Add the "bug" label to the issue
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
         run: |
           gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "bug"
-
       - name: Add another comment to the issue
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
         run: |
           gh issue comment "$ISSUE_NUMBER" --repo "$REPO" --body "Hello, We are in new change"
+
+  ServiceNowDevOpsChange:
+    needs: manage_issue  # Ensures it runs after the manage_issue job
+    runs-on: ubuntu-latest
+    name: 'ServiceNow DevOps Change'
+    steps:
+      - name: ServiceNow Change
+        uses: ServiceNow/servicenow-devops-change@VERSION
+        with:
+          devops-integration-token: ${{ secrets.SN_DEVOPS_TOKEN }}
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          context-github: ${{ toJSON(github) }}
+          job-name: 'ServiceNow DevOps Change'
+          change-request: '{"attributes":{"requested_by":{"name": "Test User"},"assignment_group":{"name": "Change Approval Team"},"priority": "2","comments": "This is a sample pipeline script to be added in your change step","work_notes": "Update this to work_notes","start_date": "2023-09-07 11:59:59","end_date": "2023-09-09 11:59:59"}}'
